@@ -16,17 +16,17 @@ export async function notifyStnPending(data: {
   refCode: string; pancakeOrderId?: string | null; note?: string
 }) {
   const lines = [
-    `🟡 <b>ĐƠN MỚI – Sốt Trộn Nộm</b>`,
+    `🟡 <b>ĐƠN MỚI – CHƯA THANH TOÁN – Sốt Trộn Nộm</b>`,
     ``,
-    `👤 <b>${data.name}</b> · ${data.phone}`,
-    `📦 ${data.product} × ${data.quantity} = <b>${data.totalPrice.toLocaleString('vi-VN')}đ</b>`,
-    `📍 ${data.address}`,
-    data.note ? `📝 ${data.note}` : '',
+    `· <b>${data.name}</b> · ${data.phone}`,
+    `· ${data.product} × ${data.quantity} = <b>${data.totalPrice.toLocaleString('vi-VN')}đ</b>`,
+    `· ${data.address}`,
+    data.note ? `· Ghi chú: ${data.note}` : '',
     ``,
-    `🔑 Mã CK: <code>${data.refCode}</code>`,
-    data.pancakeOrderId ? `📋 POScake ID: <b>${data.pancakeOrderId}</b>` : `⚠️ POScake: chưa tạo được đơn`,
+    `· Mã CK: <code>${data.refCode}</code>`,
+    data.pancakeOrderId ? `· POScake ID: <b>${data.pancakeOrderId}</b>` : `· POScake: chưa tạo được đơn`,
     ``,
-    `⏳ Chờ khách chuyển khoản...`,
+    `Chờ khách chuyển khoản...`,
   ].filter(l => l !== undefined)
   await sendTelegram(GROUP_ID, lines.join('\n'))
 }
