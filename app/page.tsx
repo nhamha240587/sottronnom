@@ -83,7 +83,7 @@ function PaymentStep({ data, form }: { data: PaymentData; form: FormState }) {
         <div className="flex justify-between items-start">
           <div>
             <span className="text-gray-500">Số tiền</span>
-            <p className="text-gray-400 text-xs mt-0.5">(chưa gồm phí vận chuyển)</p>
+            <p className="text-red-500 text-sm font-semibold mt-0.5">⚠ Chưa gồm phí vận chuyển</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-[#D97706] text-base">{fmt(data.totalPrice)}</span>
@@ -183,7 +183,7 @@ function OrderForm() {
           <span className="w-10 text-center font-bold text-xl text-[#006400]">{form.quantity}</span>
           <button type="button" onClick={() => set('quantity', Math.min(20, form.quantity + 1))}
             className="w-10 h-10 rounded-full border-2 border-gray-200 text-xl font-bold hover:border-amber-400 transition-colors flex items-center justify-center">+</button>
-          <span className="ml-2 text-sm text-gray-500">Tổng: <strong className="text-[#D97706] text-base">{fmt(total)}</strong> <span className="text-xs text-gray-400">(chưa gồm ship)</span></span>
+          <span className="ml-2 text-sm text-gray-500">Tổng: <strong className="text-[#D97706] text-base">{fmt(total)}</strong> <span className="text-sm text-red-500 font-semibold">(chưa gồm phí ship)</span></span>
         </div>
       </div>
 
