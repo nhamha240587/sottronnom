@@ -8,8 +8,13 @@ const WEBHOOK_TOKEN = process.env.SEPAY_WEBHOOK_TOKEN || ''
 
 export async function POST(req: NextRequest) {
   try {
+    // Fail-closed: thiếu token = từ chối luôn (KHÔNG cho chạy tiếp khi chưa cấu hình)
+    if (!WEBHOOK_TOKEN) {
+      console.error('[webhook] SEPAY_WEBHOOK_TOKEN chưa cấu hình — từ chối request')
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 503 })
+    }
     const auth = req.headers.get('Authorization') || ''
-    if (WEBHOOK_TOKEN && auth !== `Apikey ${WEBHOOK_TOKEN}`) {
+    if (auth !== `Apikey ${WEBHOOK_TOKEN}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -43,7 +48,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'amount_mismatch' })
     }
 
-    await confirmStnPayment(refCode)
+    // Atomic: chỉ tiếp tục nếu CHÍNH request này chuyển đơn sang 'paid'
+    // (chống race condition khi 2 webhook trùng refCode gọi đồng thời)
+    const justConfirmed = await confirmStnPayment(refCode)
+    if (!justConfirmed) {
+      return NextResponse.json({ message: 'already_paid' })
+    }
 
     let pancakeUpdated = false
     if (order.pancake_order_id) {

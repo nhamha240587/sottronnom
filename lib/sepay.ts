@@ -13,10 +13,14 @@ export interface SepayWebhookPayload {
   description: string
 }
 
+import { randomBytes } from 'crypto'
+
 export function generateStnRef(phone: string): string {
   const ts = Date.now().toString().slice(-6)
   const phonePart = phone.replace(/\D/g, '').slice(-4)
-  return `STN${phonePart}${ts}`
+  // 4 ký tự ngẫu nhiên để mã khó đoán + tránh trùng (ref_code là UNIQUE trong DB)
+  const rand = randomBytes(2).toString('hex').toUpperCase()
+  return `STN${phonePart}${ts}${rand}`
 }
 
 export function buildQRPayload(ref: string, amount: number) {

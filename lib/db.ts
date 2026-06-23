@@ -72,13 +72,19 @@ export async function getStnOrderByRef(refCode: string): Promise<StnOrder | null
   return (rows[0] as StnOrder) ?? null
 }
 
-export async function confirmStnPayment(refCode: string) {
+/**
+ * Đánh dấu đơn đã thanh toán — atomic, chống race condition.
+ * Chỉ cập nhật nếu đơn đang KHÁC 'paid'. Trả về true nếu CHÍNH lần gọi này
+ * là người chuyển trạng thái (để chỉ gửi Telegram / cập nhật POScake đúng 1 lần).
+ */
+export async function confirmStnPayment(refCode: string): Promise<boolean> {
   const db = getDb()
-  await db`
+  const rows = await db`
     UPDATE sot_tron_nom_orders
     SET payment_status = 'paid', paid_at = NOW()
-    WHERE ref_code = ${refCode}
+    WHERE ref_code = ${refCode} AND payment_status != 'paid'
   `
+  return rows.count > 0
 }
 
 export async function updateStnPancakeId(refCode: string, pancakeOrderId: string) {
