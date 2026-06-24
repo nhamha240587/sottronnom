@@ -35,6 +35,10 @@ export async function updatePancakeOrderStatus(orderId: string, status: number) 
   if (!API_KEY) return null
   const url = `${PANCAKE_API_BASE}/shops/${SHOP_ID}/orders/${orderId}?api_key=${API_KEY}`
   const res = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
-  if (!res.ok) { console.warn('[pancake] updateOrderStatus thất bại:', res.status); return null }
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '(no body)')
+    console.warn('[pancake] updateOrderStatus thất bại:', res.status, errBody)
+    return null
+  }
   return await res.json()
 }
